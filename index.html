@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chaos To-Do List ✨</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Floating decorations -->
+  <div class="sparkle sparkle-1">✨</div>
+  <div class="sparkle sparkle-2">🌙</div>
+  <div class="sparkle sparkle-3">💜</div>
+  <div class="sparkle sparkle-4">⭐</div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>Chaos To-Do List <span class="chaos-icon">🌀</span></h1>
+      <p class="subtitle">Organize your beautiful chaos</p>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <span class="stat-number" id="total-tasks">0</span>
+        <span class="stat-label">Total Tasks</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="completed-tasks">0</span>
+        <span class="stat-label">Completed</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="remaining-tasks">0</span>
+        <span class="stat-label">Remaining</span>
+      </div>
+    </div>
+
+    <!-- Add Task Form -->
+    <div class="add-task-section">
+      <div class="input-group">
+        <input 
+          type="text" 
+          id="task-input" 
+          placeholder="What needs to be done?" 
+          maxlength="200"
+        />
+        <select id="priority-select">
+          <option value="low">Low Priority</option>
+          <option value="medium" selected>Medium Priority</option>
+          <option value="high">High Priority</option>
+        </select>
+        <button id="add-task-btn" class="btn btn-purple">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Add Task
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter buttons -->
+    <div class="filter-section">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="active">Active</button>
+      <button class="filter-btn" data-filter="completed">Completed</button>
+      <button class="filter-btn" data-filter="high">High Priority</button>
+    </div>
+
+    <!-- Tasks List -->
+    <div class="tasks-container">
+      <div id="tasks-list"></div>
+      
+      <!-- Empty state -->
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">🎯</div>
+        <h3>No tasks yet!</h3>
+        <p>Add your first task to tame the chaos</p>
+      </div>
+    </div>
+
+    <!-- Clear completed button -->
+    <div class="actions">
+      <button id="clear-completed-btn" class="btn btn-outline">
+        Clear Completed Tasks
+      </button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
