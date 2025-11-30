@@ -4,8 +4,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chaos To-Do List ✨</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#b8a4d4">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Chaos To-Do">
+  
+  <!-- App Icons -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23b8a4d4' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white'>🌀</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23b8a4d4' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white'>🌀</text></svg>">
+  
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Install Button Styles */
+    .install-section {
+      text-align: center;
+      margin: 1rem 0;
+    }
+    
+    .install-btn {
+      background: var(--accent-yellow);
+      color: var(--dark-purple);
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--border-radius-pill);
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+    
+    .install-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    /* Status bar for mobile */
+    .status-bar {
+      display: none;
+      background: var(--white);
+      padding: 0.75rem 1rem;
+      border-radius: var(--border-radius-sm);
+      box-shadow: var(--shadow-sm);
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-light);
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    @media (max-width: 768px) {
+      .status-bar {
+        display: flex;
+      }
+    }
+  </style>
 </head>
 <body>
   <!-- Floating decorations -->
@@ -20,6 +81,13 @@
       <h1>Chaos To-Do List <span class="chaos-icon">🌀</span></h1>
       <p class="subtitle">Organize your beautiful chaos</p>
     </header>
+
+    <!-- Install Button -->
+    <div class="install-section">
+      <button class="install-btn" id="installBtn">
+        📲 Install App
+      </button>
+    </div>
 
     <!-- Stats -->
     <div class="stats">
@@ -86,7 +154,94 @@
         Clear Completed Tasks
       </button>
     </div>
+
+    <!-- Mobile Status Bar -->
+    <div class="status-bar">
+      <span id="status-text">Ready</span>
+      <span id="task-count">0 tasks</span>
+    </div>
   </div>
+
+  <script>
+    // PWA Installation
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+
+    // Listen for beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    // Install button click handler
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          installBtn.style.display = 'none';
+        }
+        deferredPrompt = null;
+      } else {
+        showInstallInstructions();
+      }
+    });
+
+    // Hide install button if already installed
+    window.addEventListener('appinstalled', () => {
+      installBtn.style.display = 'none';
+    });
+
+    // Check if already in standalone mode
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      installBtn.style.display = 'none';
+    }
+
+    // Fallback install instructions
+    function showInstallInstructions() {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isAndroid = /Android/.test(navigator.userAgent);
+      
+      let message = '';
+      
+      if (isIOS) {
+        message = 'To install this app:\n1. Tap the share button 📱\n2. Scroll down\n3. Tap "Add to Home Screen"';
+      } else if (isAndroid) {
+        message = 'To install this app:\n1. Tap the menu (3 dots) ⋮\n2. Tap "Add to Home Screen"\n3. Tap "Add"';
+      } else {
+        message = 'Look for "Add to Home Screen" or "Install" in your browser menu';
+      }
+      
+      alert(message);
+    }
+
+    // Update mobile status bar
+    function updateStatusBar() {
+      const statusText = document.getElementById('status-text');
+      const taskCount = document.getElementById('task-count');
+      
+      if (app && app.tasks) {
+        const total = app.tasks.length;
+        const completed = app.tasks.filter(t => t.completed).length;
+        taskCount.textContent = `${total} task${total !== 1 ? 's' : ''}`;
+        
+        if (completed === total && total > 0) {
+          statusText.textContent = 'All done! 🎉';
+        } else if (completed > 0) {
+          statusText.textContent = `${completed}/${total} done`;
+        } else {
+          statusText.textContent = 'Ready';
+        }
+      }
+    }
+
+    // Override the original updateStats to also update status bar
+    const originalUpdateStats = app.updateStats;
+    app.updateStats = function() {
+      originalUpdateStats.call(this);
+      updateStatusBar();
+    };
+  </script>
 
   <script src="script.js"></script>
 </body>
